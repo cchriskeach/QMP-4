@@ -209,6 +209,9 @@ def write_csv_file_for(id, drive=None, QMP=None):
             csv_file.write("\n".join(lines)) # blank line separates sheets in csv file
             csv_file.flush()
             os.fsync(csv_file.fileno())
+        # delete mac ._ files that may have been created
+        from qsflash import cleanup_macos_dot_files
+        cleanup_macos_dot_files(drive)
     else: # try serial port
         from microterm import microterm
         mt = microterm()
