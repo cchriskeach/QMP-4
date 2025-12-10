@@ -144,7 +144,7 @@ def load_preferences_file(mainWindow):
     preferences.clear()
     preferences.update(defaults.copy()) # start out with defaults for any missing items
     try:
-        with open(pathname.encode()) as csvfile:
+        with open(pathname) as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
             row_count = 0
             for row in reader:
@@ -254,7 +254,7 @@ def list_quadstick_csv_files(mainWindow):  # quadstick flash drive
         try:
             pathname = d + name
             print(repr(pathname))
-            with open(pathname.encode()) as csvfile:
+            with open(pathname) as csvfile:
                 firstline = csvfile.readline()
             parts = firstline.split(",")
             print(repr(parts))
