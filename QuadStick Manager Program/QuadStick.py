@@ -1829,7 +1829,7 @@ class QuadStickPreferences(wx.Frame):
                                 print("DeleteFromQuadStickEvent exception: ", repr(e))
                                 self.text_ctrl_messages.AppendText("Exception while removing: " + filename + "\n")
                         selection = self.list_box_csv_files.GetNextSelected(selection)
-            self.update_quadstick_flash_files_items()
+                    wx.CallLater(500, self.update_quadstick_flash_files_items)
         except Exception as e:
             print("Exception during DeleteFromQuadStickEvent")
             print(repr(e))
