@@ -1263,6 +1263,15 @@ class QuadStickPreferences(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.ReloadFromQuadstick, self.button_reload)
         # end wxGlade
         self.Bind(wx.EVT_CLOSE, self.CloseEvent, self)
+        
+        # menu bar for mac cmd+q support
+        menubar = wx.MenuBar()
+        file_menu = wx.Menu()
+        quit_item = file_menu.Append(wx.ID_EXIT, "Quit\tCtrl+Q")
+        self.Bind(wx.EVT_MENU, self.CancelAndClose, quit_item)
+        menubar.Append(file_menu, "&File")
+        self.SetMenuBar(menubar)
+        
         self.tbIcon = CustomTaskBarIcon(self)
         self.Bind(wx.EVT_ICONIZE, self.onMinimize, self)
         self.Bind(wx.EVT_CHAR_HOOK, self.KeyDownEvent2, self)
