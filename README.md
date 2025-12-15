@@ -4,9 +4,18 @@ This is a fork of QMP-4 built to provide MacOS support.  Support for certain win
 
 All credit and love goes to Fred Davidson for building an incredible accessibility product that has brought much joy into the world. Hopefully this fork brings a little more!
 
+## Quick Install
+
+1. Download **[QuadStick.dmg](https://github.com/cchriskeach/QMP-4/releases/download/1.0/QuadStick.dmg)**
+2. Open the downloaded DMG file
+3. Drag **QuadStick** to your Applications folder
+4. Launch QuadStick from Applications!
+
+> **Note:** Make sure your QuadStick is connected to your Mac and does not have "Enable boot in PS4 USB Mode", "Enable virtual XBox controller emulation", or "Enable virtual Dualshock emulation" enabled in the Misc tab.
+
 ## Building
 
-Create a python3.10 virtual environment and install requirements.txt . (To-do: actually add this file)
+Create a python3.10 virtual environment and install requirements.txt.
 
 ```sh
 conda create -n qmp4 python=3.10
@@ -36,12 +45,6 @@ You'll find the .app file in <br>
 
 ``` QMP-4/QuadStick Manager Program/dist/QuadStick.app ```
 
-
 ## Maintenance
 
-Neither Aidan nor Neuralink corporation intend to keep this up to date with the upstream (which has not been updated itself in a reasonable amount of time). If any contributor would like to add additional features, please make an MR!
-
-
-## Running the Application
-
-A default QuadStick.app file exists in the root directory of this repository. Drag this into your Applications folder on Mac
+Neither Chris Keach nor Neuralink corporation intend to keep this up to date with the upstream (which has not been updated itself in a reasonable amount of time). If any contributor would like to add additional features, please make an MR!
