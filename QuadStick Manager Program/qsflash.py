@@ -53,6 +53,53 @@ def request_volume_access_dialog():
         print(f"Could not show dialog: {e}")
     return None
 
+def offer_eject_installer_dmg():
+    # the install .dmg lingers mounted after the app is dragged to /Applications;
+    # offer to eject it and trash the image so the install cleans up after itself.
+    if sys.platform != 'darwin':
+        return
+    try:
+        import wx
+        for v in os.listdir('/Volumes'):
+            path = '/Volumes/' + v
+            # the installer is a read-only volume holding the app, with no config files
+            if (os.path.exists(path + '/QuadStick.app')
+                    and not os.path.exists(path + '/prefs.csv')
+                    and not os.access(path, os.W_OK)):
+                resp = wx.MessageBox(
+                    "The QuadStick installer disk image is still mounted.\n\n"
+                    "Move it to the Trash and eject it?",
+                    "Finish installation", wx.YES_NO | wx.ICON_QUESTION)
+                if resp == wx.YES:
+                    _eject_and_trash_dmg(path)
+                return
+    except Exception as e:
+        print("installer dmg check error: ", repr(e))
+
+def _eject_and_trash_dmg(volume_path):
+    import plistlib, shutil
+    dmg_file = None
+    try:  # find the backing .dmg before ejecting so we can trash it afterward
+        info = subprocess.run(['hdiutil', 'info', '-plist'], capture_output=True).stdout
+        for img in plistlib.loads(info).get('images', []):
+            for ent in img.get('system-entities', []):
+                if ent.get('mount-point') == volume_path:
+                    dmg_file = img.get('image-path')
+    except Exception as e:
+        print("could not locate dmg file: ", repr(e))
+    subprocess.run(['hdiutil', 'detach', volume_path, '-force'], capture_output=True)
+    if dmg_file and os.path.exists(dmg_file):
+        try:
+            dest = os.path.expanduser('~/.Trash/') + os.path.basename(dmg_file)
+            base, ext = os.path.splitext(dest)
+            n = 1
+            while os.path.exists(dest):
+                dest = base + ' ' + str(n) + ext
+                n += 1
+            shutil.move(dmg_file, dest)
+        except Exception as e:
+            print("could not trash dmg file: ", repr(e))
+
 preferences = {}
 defaults = {
     'joystick_deflection_minimum':'8',
@@ -146,12 +193,16 @@ def find_quadstick_drive(force=None):
     volumes_path = '/Volumes'
     try:
         volumes = os.listdir(volumes_path)
-
-        for volume in volumes:
-            if "Quad" in volume and "Stick" in volume:
-                QuadStickDrive = volumes_path + '/' + volume + '/'
-                print("Found drive ", volume)
-                return QuadStickDrive
+        candidates = [volumes_path + '/' + v + '/'
+                      for v in volumes if "Quad" in v and "Stick" in v]
+        config = [p for p in candidates
+                  if os.path.exists(p + 'prefs.csv') or os.path.exists(p + 'default.csv')]
+        writable = [p for p in candidates if os.access(p, os.W_OK)]
+        drive = (config or writable or [None])[0]
+        if drive:
+            QuadStickDrive = drive
+            print("Found drive ", drive)
+            return QuadStickDrive
     except:
         print("Failed to get drive")
 

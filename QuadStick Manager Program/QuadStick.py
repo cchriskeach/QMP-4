@@ -3055,6 +3055,7 @@ def main():
             if settings.get('start_mimimized', False):  # minimize at start
                 wx.CallAfter(QMP.Iconize, True )
 
+            wx.CallAfter(offer_eject_installer_dmg)  # tidy up the install disk image if still mounted
 
             app.MainLoop()  #
 
