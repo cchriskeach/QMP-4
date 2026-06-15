@@ -6,7 +6,7 @@ All credit and love goes to Fred Davidson for building an incredible accessibili
 
 ## Quick Install
 
-1. Download **[QuadStick.dmg](https://github.com/cchriskeach/QMP-4/releases/download/1.0/QuadStick.dmg)**
+1. Download **[QuadStick.dmg](https://github.com/cchriskeach/QMP-4/releases)**
 2. Open the downloaded DMG file
 3. Drag **QuadStick** to your Applications folder
 4. Launch QuadStick from Applications!
