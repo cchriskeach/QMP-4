@@ -124,3 +124,6 @@ QuadStick Manager Program.2023-01-02.zip
 
 # macOS
 .DS_Store
+
+# built app bundle (shipped via the release .dmg)
+/QuadStick.app/
