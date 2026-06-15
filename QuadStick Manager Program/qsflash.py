@@ -3,6 +3,55 @@
 import os
 import csv
 import subprocess
+import sys
+
+def request_volume_access_dialog():
+    """
+    Request access to the QuadStick volume using a file picker.
+    On macOS, when the user selects a folder via the system dialog,
+    the app is granted permission to access it.
+    Returns the selected path if successful, None otherwise.
+    """
+    global QuadStickDrive
+    if sys.platform != 'darwin':
+        return None
+    try:
+        import wx
+        message = (
+            "QuadStick Manager needs permission to access the QuadStick drive.\n\n"
+            "Please select the 'Quad Stick' volume in the next dialog to grant access."
+        )
+        wx.MessageBox(message, "Permission Required", wx.OK | wx.ICON_INFORMATION)
+        
+        dialog = wx.DirDialog(
+            None, 
+            "Select the 'Quad Stick' volume to grant access",
+            defaultPath="/Volumes",
+            style=wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST
+        )
+        if dialog.ShowModal() == wx.ID_OK:
+            path = dialog.GetPath()
+            dialog.Destroy()
+            # Ensure path ends with /
+            if not path.endswith('/'):
+                path += '/'
+            # Update the global drive path if it looks like the QuadStick
+            if "Quad" in path and "Stick" in path:
+                QuadStickDrive = path
+                print(f"User granted access to: {path}")
+                return path
+            else:
+                wx.MessageBox(
+                    "The selected folder doesn't appear to be a QuadStick drive.\n"
+                    "Please select the 'Quad Stick' volume.",
+                    "Wrong Volume Selected",
+                    wx.OK | wx.ICON_WARNING
+                )
+        else:
+            dialog.Destroy()
+    except Exception as e:
+        print(f"Could not show dialog: {e}")
+    return None
 
 preferences = {}
 defaults = {
@@ -153,6 +202,26 @@ def load_preferences_file(mainWindow):
                 if row_count > 3 and row and row[0] and row[1]:
                     preferences[row[0]] = row[1]
                 row_count += 1
+    except PermissionError as e:
+        print('quadstick drive found but permission denied reading prefs.csv file')
+        print(repr(e))
+        # Try to get permission via file picker
+        granted_path = request_volume_access_dialog()
+        if granted_path:
+            # Retry reading the preferences file with the newly granted access
+            try:
+                pathname = granted_path + 'prefs.csv'
+                with open(pathname) as csvfile:
+                    reader = csv.reader(csvfile, delimiter=',')
+                    row_count = 0
+                    for row in reader:
+                        if row_count > 3 and row and row[0] and row[1]:
+                            preferences[row[0]] = row[1]
+                        row_count += 1
+                return preferences
+            except Exception as retry_error:
+                print(f'Retry failed: {retry_error}')
+        return None
     except Exception as e:
         print('quadstick drive found but unable to read prefs.csv file')
         print(repr(e))
@@ -245,7 +314,22 @@ def list_quadstick_csv_files(mainWindow):  # quadstick flash drive
         return []
     print('quadstick drive letter ', repr(d))
     cleanup_macos_dot_files(d)
-    file_names = os.listdir(d)
+    try:
+        file_names = os.listdir(d)
+    except PermissionError as e:
+        print(f"PermissionError accessing QuadStick drive: {e}")
+        # Try to get permission via file picker
+        granted_path = request_volume_access_dialog()
+        if granted_path:
+            # Retry listing files with the newly granted access
+            try:
+                d = granted_path
+                file_names = os.listdir(d)
+            except Exception as retry_error:
+                print(f'Retry failed: {retry_error}')
+                return []
+        else:
+            return []
     csv_files = [n for n in file_names if n.lower().endswith('.csv') and not n.startswith('._')]
     file_list = []
     #move default and prefs to front
@@ -301,27 +385,31 @@ def quadstick_drive_serial_number(mainWindow):
 
     import sys
     if sys.platform == 'darwin':
-        # macOS: use diskutil to get device node, then read boot sector with dd
+        # Raw device reads are root-only on macOS, so recover the build from the VolumeUUID
+        # (an MD5 of the FAT serial + sector count) — brute the low 16 bits (= FW_VERSION) to match.
         try:
+            import hashlib, struct, uuid as _uuid
             mount_point = d.rstrip('/')
             result = subprocess.run(['diskutil', 'info', mount_point], capture_output=True, text=True)
-            device = None
+            vol_uuid = None
             for line in result.stdout.splitlines():
-                if 'Device Node' in line:
-                    device = line.split(':')[1].strip()
+                if 'Volume UUID' in line:
+                    vol_uuid = line.split(':', 1)[1].strip().upper()
                     break
-            if device:
-                # use dd to read boot sector (works without root for mounted volumes)
-                result = subprocess.run(
-                    ['dd', f'if={device}', 'bs=512', 'count=1'],
-                    capture_output=True
-                )
-                if result.returncode == 0 and len(result.stdout) >= 41:
-                    boot_sector = result.stdout
-                    build = boot_sector[40] * 256 + boot_sector[39]
-                    if build == 30867:  # old firmware marker
-                        build = 601
-                    return build
+            if vol_uuid:
+                NS = bytes([0xB3,0xE2,0x0F,0x39,0xF2,0x92,0x11,0xD6,0x97,0xA4,0x00,0x30,0x65,0x43,0xEC,0xAC])
+                HI_WORD = 0x6071        # high word + sector count are fixed by the flash format
+                TOTAL_SECTORS = 4096
+                for build in range(0x10000):
+                    volid = (HI_WORD << 16) | build
+                    h = bytearray(hashlib.md5(NS + struct.pack('<I', volid) + struct.pack('<I', TOTAL_SECTORS)).digest())
+                    h[6] = (h[6] & 0x0F) | 0x30
+                    h[8] = (h[8] & 0x3F) | 0x80
+                    if str(_uuid.UUID(bytes=bytes(h))).upper() == vol_uuid:
+                        if build == 30867:  # old firmware marker
+                            build = 601
+                        print("build number is: ", build)
+                        return build
         except Exception as e:
             print(f"Mac serial number read error: {e}")
         return None

@@ -591,6 +591,7 @@ class QuadStickPreferences(wx.Frame):
 
         self.list_box_csv_files = wx.ListCtrl(self.notebook_game_files, wx.ID_ANY, style=wx.BORDER_SUNKEN | wx.LC_REPORT)
         self.list_box_csv_files.SetToolTip(_("Double click to Edit"))
+        self.list_box_csv_files.SetMinSize((1, -1))  # don't let long cell text force this column wider than the others
         sizer_23.Add(self.list_box_csv_files, 4, wx.EXPAND, 0)
 
         sizer_31 = wx.BoxSizer(wx.HORIZONTAL)
@@ -603,7 +604,7 @@ class QuadStickPreferences(wx.Frame):
         self.button_load_and_run.SetToolTip(_("Requires a USB, Bluetooth or serial connection to the QuadStick"))
         sizer_40.Add(self.button_load_and_run, 1, wx.EXPAND, 0)
 
-        self.print_file_list = wx.Button(self.notebook_game_files, wx.ID_ANY, _("Print file list"))
+        self.print_file_list = wx.Button(self.notebook_game_files, wx.ID_ANY, _("Print\nfile list"))
         self.print_file_list.SetToolTip(_("Opens a browser window with the list of files in the QuadStick"))
         sizer_40.Add(self.print_file_list, 1, wx.EXPAND, 0)
 
@@ -614,24 +615,26 @@ class QuadStickPreferences(wx.Frame):
         self.button_delete_csv.SetToolTip(_("Remove the game's profile CSV file from the QuadStick"))
         sizer_63.Add(self.button_delete_csv, 1, wx.EXPAND, 0)
 
-        self.panel_18 = wx.Panel(self.notebook_game_files, wx.ID_ANY)
-        sizer_63.Add(self.panel_18, 1, wx.EXPAND, 0)
+        self.button_switch_mode_0 = wx.Button(self.notebook_game_files, wx.ID_ANY, _("Switch to\nFlash Mode"))
+        self.button_switch_mode_0.SetToolTip(_("Switch the QuadStick to a flash-capable mode (Mode 0 / PS3) over the serial cable so the flash drive becomes available. Requires the serial cable; disabled when already in a flash mode."))
+        sizer_63.Add(self.button_switch_mode_0, 1, wx.EXPAND, 0)
 
         sizer_3 = wx.StaticBoxSizer(wx.StaticBox(self.notebook_game_files, wx.ID_ANY, _("Quadstick Factory profiles")), wx.VERTICAL)
         sizer_22.Add(sizer_3, 2, wx.EXPAND, 0)
 
         self.online_game_files_list = wx.ListCtrl(self.notebook_game_files, wx.ID_ANY, style=wx.BORDER_SUNKEN | wx.LC_REPORT)
         self.online_game_files_list.SetToolTip(_("Double Click to edit. Drag over to download into to QuadStick flash."))
+        self.online_game_files_list.SetMinSize((1, -1))
         sizer_3.Add(self.online_game_files_list, 4, wx.EXPAND, 0)
 
         sizer_49 = wx.BoxSizer(wx.VERTICAL)
         sizer_3.Add(sizer_49, 1, wx.EXPAND, 0)
 
-        self.button_edit_spreadsheet = wx.Button(self.notebook_game_files, wx.ID_ANY, _("Open Configuration Spreadsheet"))
+        self.button_edit_spreadsheet = wx.Button(self.notebook_game_files, wx.ID_ANY, _("Open Configuration\nSpreadsheet"))
         self.button_edit_spreadsheet.SetToolTip(_("Opens browser on the selected configuration spreadsheet"))
         sizer_49.Add(self.button_edit_spreadsheet, 1, wx.EXPAND, 0)
 
-        self.button_download_csv = wx.Button(self.notebook_game_files, wx.ID_ANY, _("Download to QuadStick"))
+        self.button_download_csv = wx.Button(self.notebook_game_files, wx.ID_ANY, _("Download\nto QuadStick"))
         self.button_download_csv.SetToolTip(_("Download a game's custom CSV file into the QuadStick"))
         sizer_49.Add(self.button_download_csv, 1, wx.EXPAND, 0)
 
@@ -640,16 +643,17 @@ class QuadStickPreferences(wx.Frame):
 
         self.user_game_files_list = wx.ListCtrl(self.notebook_game_files, wx.ID_ANY, style=wx.BORDER_SUNKEN | wx.LC_REPORT)
         self.user_game_files_list.SetToolTip(_("Double Click to Edit.  Drag over to download into to QuadStick flash."))
+        self.user_game_files_list.SetMinSize((1, -1))
         sizer_8.Add(self.user_game_files_list, 4, wx.EXPAND, 0)
 
         sizer_48 = wx.BoxSizer(wx.VERTICAL)
         sizer_8.Add(sizer_48, 1, wx.EXPAND, 0)
 
-        self.button_add_user_game = wx.Button(self.notebook_game_files, wx.ID_ANY, _("Add Game to User List"))
+        self.button_add_user_game = wx.Button(self.notebook_game_files, wx.ID_ANY, _("Add Game\nto User List"))
         self.button_add_user_game.SetToolTip(_("Click button and paste URL for a custom configuration spreadsheet into the dialog box"))
         sizer_48.Add(self.button_add_user_game, 1, wx.EXPAND, 0)
 
-        self.button_remove_user_game = wx.Button(self.notebook_game_files, wx.ID_ANY, _("Remove Game from User List"))
+        self.button_remove_user_game = wx.Button(self.notebook_game_files, wx.ID_ANY, _("Remove Game\nfrom User List"))
         self.button_remove_user_game.SetToolTip(_("Removes the selected User Custom game from the list."))
         sizer_48.Add(self.button_remove_user_game, 1, wx.EXPAND, 0)
 
@@ -997,7 +1001,11 @@ class QuadStickPreferences(wx.Frame):
         sizer_27.Add(self.list_ctrl_firmware, 5, wx.EXPAND, 0)
 
         self.download_selected_build = wx.Button(self.notebook_firmware, wx.ID_ANY, _("Download selected Firmware\nto QuadStick"))
-        sizer_27.Add(self.download_selected_build, 1, 0, 0)
+        self.load_local_firmware = wx.Button(self.notebook_firmware, wx.ID_ANY, _("Load Local Firmware\nfile to QuadStick"))
+        sizer_firmware_buttons = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_firmware_buttons.Add(self.download_selected_build, 1, wx.EXPAND | wx.RIGHT, 4)
+        sizer_firmware_buttons.Add(self.load_local_firmware, 1, wx.EXPAND | wx.LEFT, 4)
+        sizer_27.Add(sizer_firmware_buttons, 1, wx.EXPAND, 0)
 
         self.notebook_external_pointers = wx.Panel(self.notebook, wx.ID_ANY)
         self.notebook.AddPage(self.notebook_external_pointers, _("External Pointers"))
@@ -1191,7 +1199,7 @@ class QuadStickPreferences(wx.Frame):
         self.button_save = wx.Button(self, wx.ID_ANY, _("&Save\nPreferences\nto\nQuadStick"))
         message_pane_sizer.Add(self.button_save, 1, wx.EXPAND, 0)
 
-        self.button_cancel = wx.Button(self, wx.ID_CLOSE, "")
+        self.button_cancel = wx.Button(self, wx.ID_CLOSE, _("Close\nQMP"))
         message_pane_sizer.Add(self.button_cancel, 1, wx.EXPAND, 0)
 
         self.button_reload = wx.Button(self, wx.ID_ANY, _("Reload\nPreferences\nfrom\nQuadStick"))
@@ -1218,6 +1226,7 @@ class QuadStickPreferences(wx.Frame):
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.list_box_csv_files_selected, self.list_box_csv_files)
         self.Bind(wx.EVT_BUTTON, self.LoadAndRunEvent, self.button_load_and_run)
         self.Bind(wx.EVT_BUTTON, self.PrintFileListEvent, self.print_file_list)
+        self.Bind(wx.EVT_BUTTON, self.SwitchToMode0Event, self.button_switch_mode_0)
         self.Bind(wx.EVT_BUTTON, self.DeleteFromQuadStickEvent, self.button_delete_csv)
         self.Bind(wx.EVT_LIST_BEGIN_DRAG, self.BeginDragFactoryGame, self.online_game_files_list)
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnEditSpreadsheet, self.online_game_files_list)
@@ -1249,6 +1258,7 @@ class QuadStickPreferences(wx.Frame):
         self.Bind(wx.EVT_CHECKBOX, self.vgXBoxEvent, self.checkbox_enable_vg_X360)
         self.Bind(wx.EVT_CHECKBOX, self.vgDS4Event, self.checkbox_enable_vg_DS4)
         self.Bind(wx.EVT_BUTTON, self.DownloadFirmwareEvent, self.download_selected_build)
+        self.Bind(wx.EVT_BUTTON, self.LoadLocalFirmwareEvent, self.load_local_firmware)
         self.Bind(wx.EVT_SPINCTRL, self.TIR_DeadZoneEvent, self.TIR_DeadZone)
         self.Bind(wx.EVT_CHOICE, self.MouseCaptureModeEvent, self.capture_mode)
         self.Bind(wx.EVT_SPINCTRL, self.MouseCenterXEvent, self.center_x)
@@ -1611,6 +1621,7 @@ class QuadStickPreferences(wx.Frame):
             self.text_ctrl_messages.AppendText("Using previously saved preference values\n")
         if d is None:
             self.download_selected_build.Disable()
+            self.load_local_firmware.Disable()
 
         try:
             scratch = settings.copy()
@@ -1656,6 +1667,7 @@ class QuadStickPreferences(wx.Frame):
         self._voice_files = [] #settings.get('voice_files', [])
         self._read_online_files_flag = True # tells widget to read files the first time program runs the Notebook page with the csv file list
         self._csv_files = []
+        self._csv_files_live = False  # True if read from live flash, not the cache
         print("update controls")
         self.updateControls()
         print("controls updated")
@@ -1765,8 +1777,7 @@ class QuadStickPreferences(wx.Frame):
         self.TIR_DeadZone.SetValue(int(settings.get('TIR_DeadZone', 0)))
         #self.checkbox_trackir_start.SetValue(int(settings.get('TIR_Window', 0)))
         # Firmware notebook page widgets
-        build_number = quadstick_drive_serial_number(self)
-        self.build_number_text.SetValue(str(build_number) if build_number else "Unknown")
+        build_number = self._refresh_build_number()
         self._available_firmware_list = None
         if not self.list_ctrl_firmware.GetColumnCount():
             self.list_ctrl_firmware.InsertColumn(0, "build")
@@ -1938,6 +1949,15 @@ class QuadStickPreferences(wx.Frame):
         index = 0
         _csv_files = []
         files = list_quadstick_csv_files(self)  # a tuple of (csv, id, name)
+        if files:
+            # cache so double-click-to-Sheets still works when the flash isn't mounted
+            self._csv_files_live = True
+            if settings.get('cached_csv_files') != files:
+                settings['cached_csv_files'] = files
+                save_repr_file(settings)
+        else:
+            self._csv_files_live = False
+            files = settings.get('cached_csv_files', [])
         telemetry_log('csv_files&' + urllib.parse.quote_plus(repr(files)))
         print(repr(files))
 
@@ -1957,6 +1977,15 @@ class QuadStickPreferences(wx.Frame):
         self.list_box_csv_files.SetColumnWidth(1, wx.LIST_AUTOSIZE_USEHEADER) # resize column to match new items
         self.list_box_csv_files.SetColumnWidth(2, wx.LIST_AUTOSIZE_USEHEADER) # resize column to match new items
         self._csv_files = _csv_files
+
+    def _refresh_build_number(self):
+        # cache the build so it still shows in no-flash modes and survives a startup mount-race
+        build = quadstick_drive_serial_number(self) or settings.get('cached_build')
+        if build and settings.get('cached_build') != build:
+            settings['cached_build'] = build
+            save_repr_file(settings)
+        self.build_number_text.SetValue(str(build) if build else "Unknown")
+        return build
 
     def user_game_files_dropped(self, x, y, data):
         # add a user game config file to the list
@@ -2026,7 +2055,8 @@ class QuadStickPreferences(wx.Frame):
 
     def DownloadCSVFileEvent(self, event):  # wxGlade: QuadStickPreferences.<event_handler>
         print("Event handler 'DownloadCSVFileEvent'")
-
+        if not self._flash_available_or_warn():
+            return
         # get the user's email address if necessary
         email = settings.get('user_email_address', "")
         if len(email) == 0:
@@ -2116,133 +2146,195 @@ class QuadStickPreferences(wx.Frame):
         event.Skip()
     
     def DownloadFirmwareEvent(self, event):  # wxGlade: QuadStickPreferences.<event_handler>
-        global QuadStickDrive
-        global QS
-        import shutil
-        import tempfile
+        from io import BytesIO
         from zipfile import ZipFile
         print("Event handler 'DownloadFirmwareEvent'")
         item = self.list_ctrl_firmware.GetFirstSelected()
         print("item ", repr(item))
-        if item >= 0:
-            bld_version = self._builds[item]["version"]
-            if self.build_number_text.GetValue() == bld_version:
-                self.text_ctrl_messages.AppendText("Sorry, selected build is already installed in QuadStick\n")
+        if item < 0:
+            event.Skip()
+            return
+        bld_version = self._builds[item]["version"]
+        if self.build_number_text.GetValue() == bld_version:
+            self.text_ctrl_messages.AppendText("Sorry, selected build is already installed in QuadStick\n")
+            event.Skip()
+            return
+        if not self._flash_available_or_warn():
+            event.Skip()
+            return
+        self.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+        self.text_ctrl_messages.AppendText("Download new firmware file.  Please wait...\n")
+        firmware_image_zip = get_google_drive_file_by_id(self._builds[item]["id"])
+        with ZipFile(BytesIO(firmware_image_zip), "r") as zipFile:
+            firmware_image = zipFile.read("Joystick.bin")
+        self._install_firmware_image(firmware_image, bld_version)
+        event.Skip()
+
+    def LoadLocalFirmwareEvent(self, event):  # flash a Joystick.bin chosen from disk instead of Google Drive
+        print("Event handler 'LoadLocalFirmwareEvent'")
+        if not self._flash_available_or_warn():
+            event.Skip()
+            return
+        with wx.FileDialog(self, _("Select a QuadStick firmware file (Joystick.bin)"),
+                           wildcard=_("QuadStick firmware (*.bin)|*.bin"),
+                           style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST) as dlg:
+            if dlg.ShowModal() != wx.ID_OK:
                 event.Skip()
                 return
-            # find joystick.bin file and download it
-            self.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
-            self.text_ctrl_messages.AppendText("Download new firmware file.  Please wait...\n")
-            firmware_image_zip = get_google_drive_file_by_id(self._builds[item]["id"])
-            # save contents of quadstick
-            tmp_folder_path = os.path.join(tempfile.gettempdir(), 'quad_stick_temporary_files')
-            shutil.rmtree(tmp_folder_path, True)
-            os.mkdir(tmp_folder_path)
-            # write zip file to temp folder and unzip it
-            zip_path = os.path.join(tmp_folder_path, "Joystick.zip")
-            with open(zip_path, "wb") as zipFile:
-                zipFile.write(firmware_image_zip)
-                zipFile.flush()
-            # unzip file
-            with ZipFile(zip_path, "r") as zipFile:
-                firmware_image = zipFile.read("Joystick.bin")
-            # get quadstick folder
-            qs = find_quadstick_drive()
-            # copy csv files to temp folder
-            self.text_ctrl_messages.AppendText("Backup game configuration files\n")
-            csv_file_list = list_quadstick_csv_files(self)
-            # give prefs.csv file special handling if PS4 boot mode enabled
-            try:
-                if bld_version < "1215": # old firmware can't work with PS4 boot mode
-                    p = load_preferences_file(self)
-                    p["enable_DS3_emulation"] = "0" # make sure DS4 mode off
-                    save_preferences_file(p)
-            except Exception as e:
-                print(repr(e))
-            for file in csv_file_list:
-                shutil.copyfile(qs + file[0], os.path.join(tmp_folder_path, file[0]))
-                self.text_ctrl_messages.AppendText(" " + file[0] + "\n")
-                wx.Yield()
-            self.text_ctrl_messages.AppendText("CSV files backed up to: " + tmp_folder_path + "\n")
-            self.text_ctrl_messages.AppendText("Write new firmware file to QuadStick\n")
-            # write firmware using cross-platform method
-            fw_tmp_path = qs + "Joystick.tmp"
-            with open(fw_tmp_path, 'wb') as fwfile:
-                fwfile.write(firmware_image)
-                fwfile.flush()
-                os.fsync(fwfile.fileno())
-            print("image size: ", len(firmware_image))
-            sleep(5)
-            try:
-                os.remove(qs + "Joystick.bin")
-            except:
-                pass
-            os.rename(qs + "Joystick.tmp", qs + "Joystick.bin")
-            self.text_ctrl_messages.AppendText("Wait for QuadStick to reboot...\n")
+            path = dlg.GetPath()
+        try:
+            with open(path, "rb") as f:
+                firmware_image = f.read()
+        except Exception as e:
+            wx.MessageBox(_("Could not read firmware file:\n") + repr(e), _("Error"), wx.OK | wx.ICON_ERROR)
+            event.Skip()
+            return
+        # reject anything that isn't a real QuadStick (LPC2388) image
+        import struct
+        valid_checksum = len(firmware_image) >= 32 and sum(struct.unpack('<8I', firmware_image[:32])) & 0xFFFFFFFF == 0
+        if not (valid_checksum and 200 * 1024 <= len(firmware_image) <= 512 * 1024):
+            wx.MessageBox(_("This file isn't a valid QuadStick firmware image. Flashing was cancelled."),
+                          _("Invalid firmware file"), wx.OK | wx.ICON_ERROR)
+            event.Skip()
+            return
+        self.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+        self.text_ctrl_messages.AppendText("Load local firmware file: " + path + "\n")
+        self._install_firmware_image(firmware_image, None)
+        event.Skip()
+
+    def _switch_to_mode_0(self):
+        # the serial console is the only channel that can change the USB mode, so this needs the cable
+        if self.microterm and self.microterm.serial:
+            self.microterm.sendline("enable_DS3_emulation,0")
+            self.text_ctrl_messages.AppendText("Switching QuadStick to Mode 0... the flash will mount in a few seconds.\n")
+            return True
+        wx.MessageBox(
+            _("Connect the QuadStick serial cable to switch modes.\n\n"
+              "Without it, load your first profile (default_bci.csv) on the QuadStick itself "
+              "to return it to Mode 0."),
+            _("Serial cable required"), wx.OK | wx.ICON_INFORMATION)
+        return False
+
+    def SwitchToMode0Event(self, event):
+        self._switch_to_mode_0()
+        event.Skip()
+
+    def _flash_available_or_warn(self):
+        # flashing needs the flash drive; if it isn't mounted, offer to switch to a flash mode
+        if find_quadstick_drive(True) is not None:
+            return True
+        confirm = wx.MessageDialog(self,
+            _("The QuadStick flash drive isn't available in the current emulation mode.\n\n"
+              "Switch the QuadStick to flash mode (Mode 0) now? (Requires the serial cable connected.)\n\n"
+              "Otherwise, load your first profile (default_bci.csv) on the QuadStick itself."),
+            _("QuadStick flash not available"), wx.YES_NO | wx.ICON_INFORMATION)
+        if confirm.ShowModal() == wx.ID_YES:
+            self._switch_to_mode_0()
+        confirm.Destroy()
+        return False
+
+    def _install_firmware_image(self, firmware_image, bld_version):
+        # back up CSVs, write the firmware to the flash, wait for the reflash, restore CSVs
+        global QuadStickDrive
+        global QS
+        import shutil
+        import tempfile
+        if not self._flash_available_or_warn():
+            return
+        # save contents of quadstick
+        tmp_folder_path = os.path.join(tempfile.gettempdir(), 'quad_stick_temporary_files')
+        shutil.rmtree(tmp_folder_path, True)
+        os.mkdir(tmp_folder_path)
+        # get quadstick folder
+        qs = find_quadstick_drive()
+        # copy csv files to temp folder
+        self.text_ctrl_messages.AppendText("Backup game configuration files\n")
+        csv_file_list = list_quadstick_csv_files(self)
+        # give prefs.csv file special handling if PS4 boot mode enabled
+        try:
+            if bld_version is not None and bld_version < "1215": # old firmware can't work with PS4 boot mode
+                p = load_preferences_file(self)
+                p["enable_DS3_emulation"] = "0" # make sure DS4 mode off
+                save_preferences_file(p)
+        except Exception as e:
+            print(repr(e))
+        for file in csv_file_list:
+            shutil.copyfile(qs + file[0], os.path.join(tmp_folder_path, file[0]))
+            self.text_ctrl_messages.AppendText(" " + file[0] + "\n")
             wx.Yield()
-            if QS:
-                QS.close()
-                QS = None
-            # wait for quadstick to disappear from drive list
-            for sec in range(40):
+        self.text_ctrl_messages.AppendText("CSV files backed up to: " + tmp_folder_path + "\n")
+        self.text_ctrl_messages.AppendText("Write new firmware file to QuadStick\n")
+        # write firmware using cross-platform method
+        fw_tmp_path = qs + "Joystick.tmp"
+        with open(fw_tmp_path, 'wb') as fwfile:
+            fwfile.write(firmware_image)
+            fwfile.flush()
+            os.fsync(fwfile.fileno())
+        sleep(5)
+        try:
+            os.remove(qs + "Joystick.bin")
+        except:
+            pass
+        os.rename(qs + "Joystick.tmp", qs + "Joystick.bin")
+        self.text_ctrl_messages.AppendText("Wait for QuadStick to reboot...\n")
+        wx.Yield()
+        if QS:
+            QS.close()
+            QS = None
+        # wait for quadstick to disappear from drive list
+        for sec in range(40):
+            sleep(1.0)
+            wx.Yield()
+            self.text_ctrl_messages.AppendText(".")
+            # force actual search for QS
+            if find_quadstick_drive(True) is None: break
+        if find_quadstick_drive(True) is None:
+            self.text_ctrl_messages.AppendText("\nQuadStick rebooting\n")
+        else:
+            self.text_ctrl_messages.AppendText("\nQuadStick reboot not detected\n")
+            eject_msg = "The QuadStick did not automatically reboot!\n\nEject the QuadStick drive.\nIf QuadStick does not restart in ten seconds,\nunplug it and plug it back in\nthen click OK"
+            wx.MessageBox(eject_msg, 'Error', wx.OK | wx.ICON_ERROR)
+        self.text_ctrl_messages.AppendText("Waiting for QuadStick to install new firmware...\n")
+        for i in range(5):
+            for sec in range(60):
                 sleep(1.0)
                 wx.Yield()
-                print(sec)
                 self.text_ctrl_messages.AppendText(".")
-                # force actual search for QS
-                if find_quadstick_drive(True) is None: break
-            if find_quadstick_drive(True) is None:
-                self.text_ctrl_messages.AppendText("\nQuadStick rebooting\n")
-            else:
-                self.text_ctrl_messages.AppendText("\nQuadStick reboot not detected\n")
-                eject_msg = "The QuadStick did not automatically reboot!\n\nEject the QuadStick drive.\nIf QuadStick does not restart in ten seconds,\nunplug it and plug it back in\nthen click OK"
-                wx.MessageBox(eject_msg, 'Error', wx.OK | wx.ICON_ERROR)
-            self.text_ctrl_messages.AppendText("Waiting for QuadStick to install new firmware...\n")
-            for i in range(5):
-                for sec in range(60):
-                    sleep(1.0)
+                if find_quadstick_drive(): break
+            qs = find_quadstick_drive()
+            if qs:
+                # copy csv files back to quadstick
+                self.text_ctrl_messages.AppendText("\nCopy files back\n")
+                sleep(4)
+                for file in csv_file_list:
+                    shutil.copyfile(os.path.join(tmp_folder_path, file[0]), qs + file[0])
+                    self.text_ctrl_messages.AppendText(" " + file[0] + "\n")
                     wx.Yield()
-                    print(sec)
-                    self.text_ctrl_messages.AppendText(".")
-                    if find_quadstick_drive(): break
-                qs = find_quadstick_drive()
-                if qs:
-                    # copy csv files back to quadstick
-                    self.text_ctrl_messages.AppendText("\nCopy files back\n")
-                    sleep(4)
-                    for file in csv_file_list:
-                        shutil.copyfile(os.path.join(tmp_folder_path, file[0]), qs + file[0])
-                        self.text_ctrl_messages.AppendText(" " + file[0] + "\n")
-                        wx.Yield()
-                    self.text_ctrl_messages.AppendText("Done!\n")
+                self.text_ctrl_messages.AppendText("Done!\n")
 
-                    # reopen game controller interface
-                    try:
-                        QS = QuadStickHID(self, self.VG)
-                        QS.enable(settings.get('enable_CM', True))
-                        updater = None
-                        if CM: updater = CM.update
-                        QS = QS.open(updater) # None if QS did not open
-                        self.QS = QS # used for checkbox event
-                    except Exception as e:
-                        print("reopen QS error: ", repr(e))
+                # reopen game controller interface
+                try:
+                    QS = QuadStickHID(self, self.VG)
+                    QS.enable(settings.get('enable_CM', True))
+                    updater = None
+                    if CM: updater = CM.update
+                    QS = QS.open(updater) # None if QS did not open
+                    self.QS = QS # used for checkbox event
+                except Exception as e:
+                    print("reopen QS error: ", repr(e))
+                break
+            else:
+                self.text_ctrl_messages.AppendText("QMP was not able to copy CSV files to Quadtick\n")
+                confirm = wx.MessageDialog( self, "QMP was not able to copy CSV files to Quadtick\nTry Again?", caption="Error copying CSV files!", style=wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION | wx.STAY_ON_TOP )
+                result = confirm.ShowModal()
+                if result != wx.ID_YES:
                     break
-                else:
-                    self.text_ctrl_messages.AppendText("QMP was not able to copy CSV files to Quadtick\n")
-                    confirm = wx.MessageDialog( self, "QMP was not able to copy CSV files to Quadtick\nTry Again?", caption="Error copying CSV files!", style=wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION | wx.STAY_ON_TOP )
-                    result = confirm.ShowModal()
-                    #self.text_ctrl_messages.AppendText(repr(result) + "\n")
-                    if result != wx.ID_YES:
-                        break
-            #shutil.rmtree(tmp_folder_path, True)
-            new_build = quadstick_drive_serial_number(self)
-            self.build_number_text.SetValue(str(new_build) if new_build else "Unknown")
-            self.update_online_game_files_list_items()
-            self.update_quadstick_flash_files_items()
-            self.updateControls()
-            telemetry_log('firmwareupdate&firmware=' + self.build_number_text.GetValue())
-            self.SetCursor(wx.Cursor(wx.CURSOR_DEFAULT))
-        event.Skip()
+        self._refresh_build_number()
+        self.update_online_game_files_list_items()
+        self.update_quadstick_flash_files_items()
+        self.updateControls()
+        telemetry_log('firmwareupdate&firmware=' + self.build_number_text.GetValue())
+        self.SetCursor(wx.Cursor(wx.CURSOR_DEFAULT))
     def onMessagePaneEnter(self, event):  # wxGlade: QuadStickPreferences.<event_handler>
         global EnableTouchPad
         #print "Event handler 'onMessagePaneEnter'"
@@ -2794,18 +2886,6 @@ class QuadStickPreferences(wx.Frame):
         ib = wx.IconBundle()
         ib.AddIcon(resource_path("quadstickx.ico"), wx.BITMAP_TYPE_ANY)
         self.SetIcons(ib)
-        # # Content of this block not found. Did you rename this class?
-        # pass
-        # self.TIR_LeftUp.SetBarColor(wx.Colour(0,255,0))
-        # self.TIR_LeftLeft.SetBarColor(wx.Colour(0,0,0))
-        # self.TIR_LeftRight.SetBarColor(wx.Colour(0,255,0))
-        # self.TIR_LeftDown.SetBarColor(wx.Colour(0,0,0))
-        # self.TIR_RightUp.SetBarColor(wx.Colour(0,255,0))
-        # self.TIR_RightLeft.SetBarColor(wx.Colour(0,0,0))
-        # self.TIR_RightRight.SetBarColor(wx.Colour(0,255,0))
-        # self.TIR_RightDown.SetBarColor(wx.Colour(0,0,0))
-        # self.grid_1.SetDefaultCellFont(wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, True))
-        # self.grid_1.AutoSizeColumns(True)
 
 
     def on_USB_status_timer(self):  # periodically checks the USB status of the Quadstick
@@ -2819,6 +2899,14 @@ class QuadStickPreferences(wx.Frame):
                 if not QS.is_plugged():
                     QS.close()
                     self.text_ctrl_messages.AppendText("Quadstick disconnected\r\n")
+            flash_available = find_quadstick_drive(True) is not None
+            self.download_selected_build.Enable(flash_available)
+            self.load_local_firmware.Enable(flash_available)
+            self.button_switch_mode_0.Enable(not flash_available and bool(self.microterm and self.microterm.serial))
+            # the flash mounts a few seconds after the device enumerates, so reload once it appears
+            if not self._csv_files_live and flash_available:
+                self.update_quadstick_flash_files_items()
+                self._refresh_build_number()
         except Exception as e:
             print ('USB status exception: ', repr(e))
             print (traceback.format_exc())

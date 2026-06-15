@@ -121,3 +121,6 @@ Installer/signed/QMP_Installer_4.exe
 QuadStick Manager Program.2023-01-01.zip
 QuadStick Manager Program.2023-01-02.zip
 *.dmg
+
+# macOS
+.DS_Store
